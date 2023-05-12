@@ -1,2 +1,2 @@
 # Vladimir-Nachev-employees
-Employees longest period of work together.
+Employees longest period of working together.
