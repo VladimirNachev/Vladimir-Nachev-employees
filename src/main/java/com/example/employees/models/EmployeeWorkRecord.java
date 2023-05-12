@@ -1,38 +1,32 @@
 package com.example.employees.models;
 
+import com.example.employees.utils.csv.converters.LocalDateConverter;
 import com.opencsv.bean.CsvBindByPosition;
+import com.opencsv.bean.CsvCustomBindByPosition;
 import com.opencsv.bean.CsvDate;
 import com.opencsv.bean.processor.ConvertWordNullToNull;
 import com.opencsv.bean.processor.PreAssignmentProcessor;
-import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public class EmployeeWorkRecord {
-    @NotNull
     @CsvBindByPosition(position = 0, required = true)
     private long employeeId;
 
-    @NotNull
     @CsvBindByPosition(position = 1, required = true)
     private long projectId;
 
-    @NotNull
-    @CsvDate(value = "yyyy-MM-dd")
-    @CsvBindByPosition(position = 2, required = true)
+    @CsvCustomBindByPosition(position = 2, required = true, converter = LocalDateConverter.class)
     private LocalDate dateFrom;
 
-    @Nullable
-    @CsvDate(value = "yyyy-MM-dd")
     @PreAssignmentProcessor(processor = ConvertWordNullToNull.class)
-    @CsvBindByPosition(position = 3, required = true)
+    @CsvCustomBindByPosition(position = 3, required = true, converter = LocalDateConverter.class)
     private LocalDate dateTo;
 
     public EmployeeWorkRecord() {
     }
 
-    public EmployeeWorkRecord(long employeeId, long projectId, LocalDate dateFrom, @Nullable LocalDate dateTo) {
+    public EmployeeWorkRecord(long employeeId, long projectId, LocalDate dateFrom, LocalDate dateTo) {
         this.employeeId = employeeId;
         this.projectId = projectId;
         this.dateFrom = dateFrom;
@@ -51,7 +45,6 @@ public class EmployeeWorkRecord {
         return dateFrom;
     }
 
-    @Nullable
     public LocalDate getDateTo() {
         return dateTo;
     }
@@ -68,7 +61,7 @@ public class EmployeeWorkRecord {
         this.dateFrom = dateFrom;
     }
 
-    public void setDateTo(@Nullable LocalDate dateTo) {
+    public void setDateTo(LocalDate dateTo) {
         this.dateTo = dateTo;
     }
 }
