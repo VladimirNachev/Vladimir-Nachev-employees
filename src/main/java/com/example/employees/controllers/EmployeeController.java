@@ -31,7 +31,7 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @PostMapping("/upload-csv-file")
+    @PostMapping(path = "/upload-csv-file", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadCsvFileWithEmployees(@RequestParam("fileName") MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have passed an empty csv file !");
