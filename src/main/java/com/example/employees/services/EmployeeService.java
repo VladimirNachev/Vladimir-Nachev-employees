@@ -6,5 +6,5 @@ import com.example.employees.models.EmployeeWorkRecord;
 import java.util.List;
 
 public interface EmployeeService {
-    EmployeesPairDTO findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeeWorkRecords);
+    EmployeesPairDTO findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeesWorkRecords);
 }

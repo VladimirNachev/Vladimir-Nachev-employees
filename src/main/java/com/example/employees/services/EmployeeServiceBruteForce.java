@@ -1,6 +1,7 @@
 package com.example.employees.services;
 
 import com.example.employees.dtos.EmployeesPairDTO;
+import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
 import com.example.employees.models.EmployeesProjectTripple;
@@ -18,9 +19,9 @@ import static org.apache.commons.lang3.ObjectUtils.min;
 public class EmployeeServiceBruteForce implements EmployeeService {
     @Override
     public EmployeesPairDTO findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeesWorkRecords) {
-        validateEmployeeWorkRecords(employeesWorkRecords);
-        Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays = new HashMap<>();
+        validateEmployeesWorkRecords(employeesWorkRecords);
 
+        Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays = new HashMap<>();
         for (int i = 0; i < employeesWorkRecords.size() - 1; i++) {
             for (int j = i + 1; j < employeesWorkRecords.size(); j++) {
                 EmployeeWorkRecord firstRow = employeesWorkRecords.get(i);
@@ -42,15 +43,21 @@ public class EmployeeServiceBruteForce implements EmployeeService {
             }
         }
 
-        Map.Entry<EmployeesProjectTripple, Integer> entry = Collections.max(employeesProjectTrippleToCommonWorkingDays.entrySet(),
-                Comparator.comparingInt(Map.Entry::getValue));
-        return buildEmployeesPairDTO(entry, employeesWorkRecords);
+
+        return buildEmployeesPairDTO(employeesProjectTrippleToCommonWorkingDays, employeesWorkRecords);
     }
 
+    // TODO: Start using Optional class for better null values handling in the whole project.
     private EmployeesPairDTO buildEmployeesPairDTO(
-            Map.Entry<EmployeesProjectTripple, Integer> entry,
+            Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays,
             List<EmployeeWorkRecord> employeesWorkRecords
     ) {
+        Map.Entry<EmployeesProjectTripple, Integer> entry = null;
+        if (!employeesProjectTrippleToCommonWorkingDays.isEmpty()) {
+            entry = Collections.max(employeesProjectTrippleToCommonWorkingDays.entrySet(),
+                    Comparator.comparingInt(Map.Entry::getValue));
+        }
+
         if (entry == null) {
             // If there is no entry since no two employees have worked together we just return two randomly chosen
             // employee ids (not necessarily different) and 0 common working days.
@@ -84,9 +91,12 @@ public class EmployeeServiceBruteForce implements EmployeeService {
         ) + 1;
     }
 
-    private void validateEmployeeWorkRecords(List<EmployeeWorkRecord> employeeWorkRecords) {
+    private void validateEmployeesWorkRecords(List<EmployeeWorkRecord> employeesWorkRecords) {
         // TODO: Improve validation (for example, check if dateFrom <= dateTo for every record)
-        if (employeeWorkRecords.size() == 1) {
+        if (employeesWorkRecords.isEmpty()) {
+            throw new EmptyCsvFileException();
+        }
+        if (employeesWorkRecords.size() == 1) {
             throw new OnlyOneEmployeeAvailableException();
         }
     }

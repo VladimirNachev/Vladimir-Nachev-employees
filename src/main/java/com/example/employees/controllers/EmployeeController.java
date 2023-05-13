@@ -1,6 +1,7 @@
 package com.example.employees.controllers;
 
 import com.example.employees.dtos.EmployeesPairDTO;
+import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
 import com.example.employees.services.EmployeeService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,11 +34,7 @@ public class EmployeeController {
     }
 
     @PostMapping(path = "/upload-csv-file", consumes = "multipart/form-data")
-    public ResponseEntity<?> uploadCsvFileWithEmployees(@RequestParam("fileName") MultipartFile file) {
-        if (file.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have passed an empty csv file !");
-        }
-
+    public ResponseEntity<?> findLongestWorkingTogetherPairOfEmployees(@RequestParam("fileName") MultipartFile file) {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             List<EmployeeWorkRecord> employeesWorkRecords = buildEmployeeWorkRecords(reader);
             EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
@@ -47,6 +45,9 @@ public class EmployeeController {
     }
 
     private ResponseEntity<?> handleException(Exception e) {
+        if (e instanceof EmptyCsvFileException) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have passed an empty csv file !");
+        }
         if (e instanceof OnlyOneEmployeeAvailableException) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one employee available in the given csv file !");
         }
