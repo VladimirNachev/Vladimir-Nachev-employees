@@ -8,6 +8,8 @@ import com.example.employees.models.EmployeesPair;
 import com.example.employees.services.EmployeeService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 
 @RestController
 public class EmployeeController {
+    private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
+
     private final EmployeeService employeeService;
 
     @Autowired
@@ -61,6 +65,7 @@ public class EmployeeController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new EmployeesPairDTO("Only one employee available in the given csv file !"));
         }
+        logger.error(String.format("Error while calculating longest working together pair of employees ! exception=%s", e));
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new EmployeesPairDTO("Error while calculating longest working together pair of employees !"));

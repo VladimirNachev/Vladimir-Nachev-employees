@@ -4,11 +4,14 @@ import com.example.employees.TestUtils;
 import com.example.employees.dtos.EmployeesPairDTO;
 import com.example.employees.services.EmployeeService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.io.FileSystemResource;
@@ -21,6 +24,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ExtendWith(OutputCaptureExtension.class)
 public class EmployeeControllerTests {
     @SpyBean
     private final EmployeeService employeeService;
@@ -98,7 +102,9 @@ public class EmployeeControllerTests {
     }
 
     @Test
-    public void testFindLongestWorkingTogetherPairOfEmployeesEndpointWhenUnexpectedErrorOccursThenReturnInternalServerError() {
+    public void testFindLongestWorkingTogetherPairOfEmployeesEndpointWhenUnexpectedErrorOccursThenReturnInternalServerError(
+            CapturedOutput capturedOutput
+    ) {
         doThrow(new RuntimeException()).when(employeeService).findLongestWorkingPairOfEmployees(any());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -113,5 +119,7 @@ public class EmployeeControllerTests {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Error while calculating longest working together pair of employees !", response.getBody().getError());
+        assertTrue(capturedOutput.getOut().contains("Error while calculating longest working together pair " +
+                "of employees ! exception=java.lang.RuntimeException"));
     }
 }
