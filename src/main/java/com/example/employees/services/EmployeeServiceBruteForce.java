@@ -1,9 +1,9 @@
 package com.example.employees.services;
 
-import com.example.employees.models.EmployeesPair;
 import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
+import com.example.employees.models.EmployeesPair;
 import com.example.employees.models.EmployeesProjectTripple;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -14,6 +14,7 @@ import java.util.*;
 import static org.apache.commons.lang3.ObjectUtils.max;
 import static org.apache.commons.lang3.ObjectUtils.min;
 
+// TODO: Think of better names for the service class, qualifier annotation, etc.
 @Service
 @Qualifier("brute-force-approach")
 public class EmployeeServiceBruteForce implements EmployeeService {

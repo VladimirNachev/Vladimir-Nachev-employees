@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @RestController
 public class EmployeeController {
     private static final Logger logger = LoggerFactory.getLogger(EmployeeController.class);
-
     private final EmployeeService employeeService;
 
     @Autowired
