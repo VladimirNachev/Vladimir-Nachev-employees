@@ -5,11 +5,16 @@ import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
 import com.example.employees.models.EmployeesPair;
 import com.example.employees.models.EmployeesProjectTripple;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.lang3.ObjectUtils.max;
 import static org.apache.commons.lang3.ObjectUtils.min;
@@ -18,6 +23,7 @@ import static org.apache.commons.lang3.ObjectUtils.min;
 @Service
 @Qualifier("brute-force-approach")
 public class EmployeeServiceBruteForce implements EmployeeService {
+
     @Override
     public EmployeesPair findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeesWorkRecords) {
         validateEmployeesWorkRecords(employeesWorkRecords);
@@ -53,13 +59,7 @@ public class EmployeeServiceBruteForce implements EmployeeService {
             Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays,
             List<EmployeeWorkRecord> employeesWorkRecords
     ) {
-        Map.Entry<EmployeesProjectTripple, Integer> entry = null;
-        if (!employeesProjectTrippleToCommonWorkingDays.isEmpty()) {
-            entry = Collections.max(employeesProjectTrippleToCommonWorkingDays.entrySet(),
-                    Comparator.comparingInt(Map.Entry::getValue));
-        }
-
-        if (entry == null) {
+        if (employeesProjectTrippleToCommonWorkingDays.isEmpty()) {
             // If there is no entry since no two employees have worked together we just return two randomly chosen
             // employee ids (not necessarily different) and 0 common working days.
             return new EmployeesPair(
@@ -68,11 +68,33 @@ public class EmployeeServiceBruteForce implements EmployeeService {
                     0
             );
         }
+        Map<Pair<Long, Long>, Integer> employeePairsToCommonWorkingDays =
+                buildEmployeePairsToCommonWorkingDays(employeesProjectTrippleToCommonWorkingDays);
+
+        Map.Entry<Pair<Long, Long>, Integer> longestWorkingEmployeePair =
+                employeePairsToCommonWorkingDays.entrySet().stream()
+                        .max(Comparator.comparingInt(Map.Entry::getValue))
+                        .orElseThrow();
+
         return new EmployeesPair(
-                entry.getKey().getFirstEmployeeId(),
-                entry.getKey().getSecondEmployeeId(),
-                entry.getValue()
+                longestWorkingEmployeePair.getKey().getLeft(),
+                longestWorkingEmployeePair.getKey().getRight(),
+                longestWorkingEmployeePair.getValue()
         );
+    }
+
+    private Map<Pair<Long, Long>, Integer> buildEmployeePairsToCommonWorkingDays(
+            Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays
+    ) {
+        return employeesProjectTrippleToCommonWorkingDays.entrySet().stream()
+                .map(entry -> new EmployeesPair(
+                        entry.getKey().getFirstEmployeeId(),
+                        entry.getKey().getSecondEmployeeId(),
+                        entry.getValue()))
+                .collect(Collectors.toMap(
+                        (entry) -> Pair.of(entry.getFirstEmployeeId(), entry.getSecondEmployeeId()),
+                        EmployeesPair::getCommonWorkingDaysCount,
+                        Integer::sum));
     }
 
     private boolean areEmployeesDifferentAndWorkedOnSameProject(EmployeeWorkRecord firstRow, EmployeeWorkRecord secondRow) {

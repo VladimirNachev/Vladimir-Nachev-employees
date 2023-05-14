@@ -59,6 +59,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -97,6 +98,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -115,6 +117,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(1, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -132,6 +135,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(3, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -150,6 +154,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -167,6 +172,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -185,6 +191,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -202,6 +209,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(846, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -220,6 +228,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(1, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -237,6 +246,7 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 218, 143));
         assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
@@ -254,7 +264,43 @@ public class EmployeeServiceTests {
 
         EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
         assertEquals(845, employeesPair.getCommonWorkingDaysCount());
+    }
+
+    @Test
+    public void testFindLongestWorkingPairOfEmployeesWhenOnePairWorkingLongestTogetherButOnMultipleProjectsRatherThanOnOneProject() {
+//        1,1,2023-01-01,2023-01-05
+//        2,1,2023-01-02,2023-01-04
+//        1,2,2023-02-01,2023-02-05
+//        2,2,2023-02-02,2023-02-07
+//        3,3,2023-01-01,2023-01-05
+//        4,3,2023-01-01,2023-01-05
+//        5,4,2023-01-01,2023-01-02
+//        6,4,2023-01-01,2023-01-02
+//        5,5,2023-02-01,2023-02-02
+//        6,5,2023-02-02,2023-02-02
+//        5,6,2023-03-01,2023-03-03
+//        6,6,2023-03-01,2023-03-03
+        List<EmployeeWorkRecord> employeesWorkRecords = Arrays.asList(
+                new EmployeeWorkRecord(1, 1, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-05")),
+                new EmployeeWorkRecord(2, 1, LocalDate.parse("2023-01-02"), LocalDate.parse("2023-01-04")),
+                new EmployeeWorkRecord(1, 2, LocalDate.parse("2023-02-01"), LocalDate.parse("2023-02-05")),
+                new EmployeeWorkRecord(2, 2, LocalDate.parse("2023-02-02"), LocalDate.parse("2023-02-07")),
+                new EmployeeWorkRecord(3, 3, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-05")),
+                new EmployeeWorkRecord(4, 3, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-05")),
+                new EmployeeWorkRecord(5, 4, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-02")),
+                new EmployeeWorkRecord(6, 4, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-02")),
+                new EmployeeWorkRecord(5, 5, LocalDate.parse("2023-02-01"), LocalDate.parse("2023-02-02")),
+                new EmployeeWorkRecord(6, 5, LocalDate.parse("2023-02-02"), LocalDate.parse("2023-02-02")),
+                new EmployeeWorkRecord(5, 6, LocalDate.parse("2023-03-01"), LocalDate.parse("2023-03-03")),
+                new EmployeeWorkRecord(6, 6, LocalDate.parse("2023-03-01"), LocalDate.parse("2023-03-03"))
+        );
+
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 1, 2));
+        assertEquals(7, employeesPair.getCommonWorkingDaysCount());
     }
 
     // TODO: Add tests for the remaining cases.
