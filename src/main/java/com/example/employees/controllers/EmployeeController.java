@@ -76,12 +76,6 @@ public class EmployeeController {
                 .withIgnoreLeadingWhiteSpace(true)
                 .withIgnoreEmptyLine(true)
                 .build();
-        return csvToBean.parse().stream()
-                .peek(employeeWorkRecord -> {
-                    if (employeeWorkRecord.getDateTo() == null) {
-                        employeeWorkRecord.setDateTo(LocalDate.now());
-                    }
-                })
-                .collect(Collectors.toList());
+        return csvToBean.parse();
     }
 }
