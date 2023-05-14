@@ -4,6 +4,7 @@ import com.example.employees.dtos.EmployeesPairDTO;
 import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
+import com.example.employees.models.EmployeesPair;
 import com.example.employees.services.EmployeeService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,10 +35,16 @@ public class EmployeeController {
 
     @PostMapping(path = "/upload-csv-file", consumes = "multipart/form-data")
     public ResponseEntity<?> findLongestWorkingTogetherPairOfEmployees(@RequestParam("fileName") MultipartFile file) {
+        if (file == null) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new EmployeesPairDTO("You have not passed a csv file !"));
+        }
+
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             List<EmployeeWorkRecord> employeesWorkRecords = buildEmployeeWorkRecords(reader);
-            EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
-            return ResponseEntity.status(HttpStatus.OK).body(employeesPairDTO);
+            EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+            return ResponseEntity.status(HttpStatus.OK).body(new EmployeesPairDTO(employeesPair));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -46,13 +52,18 @@ public class EmployeeController {
 
     private ResponseEntity<?> handleException(Exception e) {
         if (e instanceof EmptyCsvFileException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You have passed an empty csv file !");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new EmployeesPairDTO("You have passed an empty csv file !"));
         }
         if (e instanceof OnlyOneEmployeeAvailableException) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only one employee available in the given csv file !");
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new EmployeesPairDTO("Only one employee available in the given csv file !"));
         }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error while uploading CSV file " +
-                "with employees work records !");
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new EmployeesPairDTO("Error while calculating longest working together pair of employees !"));
     }
 
     private List<EmployeeWorkRecord> buildEmployeeWorkRecords(Reader reader) {

@@ -1,9 +1,10 @@
 package com.example.employees.services;
 
-import com.example.employees.dtos.EmployeesPairDTO;
+import com.example.employees.TestUtils;
 import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
+import com.example.employees.models.EmployeesPair;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,14 +23,16 @@ public class EmployeeServiceTests {
     @Qualifier("brute-force-approach")
     private EmployeeService employeeService;
 
+    private final TestUtils testUtils = new TestUtils();
+
     @Test
     public void testFindLongestWorkingPairOfEmployeesWhenEmployeesWorkRecordsGivenThenReturnCommonWorkingDays() {
-//        143,12,2013-11-01,2014-01-05
-//        218,10,2012-05-16,NULL
-//        143,10,2009-01-01,2011-04-27
-//        218,12,2014-01-02,2014-01-10
-//        123,1,2023-05-05,2023/05/12
-//        234,1,2023-05-01,2023.05.05
+        // 143,12,2013-11-01,2014-01-05
+        // 218,10,2012-05-16,NULL
+        // 143,10,2009-01-01,2011-04-27
+        // 218,12,2014-01-02,2014-01-10
+        // 123,1,2023-05-05,2023/05/12
+        // 234,1,2023-05-01,2023.05.05
         List<EmployeeWorkRecord> employeesWorkRecords = Arrays.asList(
                 new EmployeeWorkRecord(143, 12, LocalDate.parse("2013-11-01"), LocalDate.parse("2014-01-05")),
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2012-05-16"), LocalDate.now()),
@@ -39,35 +42,24 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(234, 1, LocalDate.parse("2023-05-01"), LocalDate.parse("2023-05-05"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertTrue(employeesIdsAreExpected(employeesPairDTO, 143, 218));
-        assertEquals(4, employeesPairDTO.getCommonWorkingDaysCount());
-    }
-
-    private boolean employeesIdsAreExpected(
-            EmployeesPairDTO employeesPairDTO,
-            long expectedFirstEmployeeId,
-            long expectedSecondEmployeeId
-    ) {
-        return (employeesPairDTO.getFirstEmployeeId() == expectedFirstEmployeeId &&
-                employeesPairDTO.getSecondEmployeeId() == expectedSecondEmployeeId) ||
-                (employeesPairDTO.getFirstEmployeeId() == expectedSecondEmployeeId &&
-                        employeesPairDTO.getSecondEmployeeId() == expectedFirstEmployeeId);
+        assertTrue(testUtils.employeesIdsAreExpected(employeesPair, 143, 218));
+        assertEquals(4, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
     public void testFindLongestWorkingPairOfEmployeesWhenNoDateRangeOverlapBecauseOfDifferentProjectsThenReturnZeroWorkingDays() {
-//        143,12,2013-11-01,2014-01-05
-//        218,10,2012-05-16,NULL
+        // 143,12,2013-11-01,2014-01-05
+        // 218,10,2012-05-16,NULL
         List<EmployeeWorkRecord> employeesWorkRecords = Arrays.asList(
                 new EmployeeWorkRecord(143, 12, LocalDate.parse("2013-11-01"), LocalDate.parse("2014-01-05")),
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2012-05-16"), LocalDate.now())
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(0, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -80,7 +72,7 @@ public class EmployeeServiceTests {
 
     @Test
     public void testFindLongestWorkingPairOfEmployeesWhenListWithOnlyOneEmployeeWorkRecordGivenThenThrowException() {
-//        143,12,2013-11-01,2014-01-05
+        // 143,12,2013-11-01,2014-01-05
         List<EmployeeWorkRecord> employeesWorkRecords = List.of(
                 new EmployeeWorkRecord(143, 12, LocalDate.parse("2013-11-01"), LocalDate.parse("2014-01-05"))
         );
@@ -103,9 +95,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2014-01-02"), LocalDate.parse("2014-07-10"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(0, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -121,9 +113,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2011-04-27"), LocalDate.parse("2014-07-10"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(1, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(1, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -138,9 +130,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2011-04-25"), LocalDate.parse("2014-07-10"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(3, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(3, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -156,9 +148,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2009-01-01"), LocalDate.parse("2014-07-10"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(847, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -173,9 +165,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2008-12-31"), LocalDate.parse("2014-07-10"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(847, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -191,9 +183,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2008-12-31"), LocalDate.parse("2011-04-27"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(847, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(847, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -208,9 +200,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2008-12-31"), LocalDate.parse("2011-04-26"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(846, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(846, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -226,9 +218,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2008-12-31"), LocalDate.parse("2009-01-01"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(1, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(1, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -243,9 +235,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(143, 10, LocalDate.parse("2009-01-01"), LocalDate.parse("2011-04-27"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(0, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(0, employeesPair.getCommonWorkingDaysCount());
     }
 
     @Test
@@ -260,9 +252,9 @@ public class EmployeeServiceTests {
                 new EmployeeWorkRecord(218, 10, LocalDate.parse("2009-01-02"), LocalDate.parse("2011-04-26"))
         );
 
-        EmployeesPairDTO employeesPairDTO = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
+        EmployeesPair employeesPair = employeeService.findLongestWorkingPairOfEmployees(employeesWorkRecords);
 
-        assertEquals(845, employeesPairDTO.getCommonWorkingDaysCount());
+        assertEquals(845, employeesPair.getCommonWorkingDaysCount());
     }
 
     // TODO: Add tests for the remaining cases.

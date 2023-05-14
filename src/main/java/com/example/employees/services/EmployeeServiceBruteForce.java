@@ -1,6 +1,6 @@
 package com.example.employees.services;
 
-import com.example.employees.dtos.EmployeesPairDTO;
+import com.example.employees.models.EmployeesPair;
 import com.example.employees.exceptions.EmptyCsvFileException;
 import com.example.employees.exceptions.OnlyOneEmployeeAvailableException;
 import com.example.employees.models.EmployeeWorkRecord;
@@ -18,7 +18,7 @@ import static org.apache.commons.lang3.ObjectUtils.min;
 @Qualifier("brute-force-approach")
 public class EmployeeServiceBruteForce implements EmployeeService {
     @Override
-    public EmployeesPairDTO findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeesWorkRecords) {
+    public EmployeesPair findLongestWorkingPairOfEmployees(List<EmployeeWorkRecord> employeesWorkRecords) {
         validateEmployeesWorkRecords(employeesWorkRecords);
 
         Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays = new HashMap<>();
@@ -44,11 +44,11 @@ public class EmployeeServiceBruteForce implements EmployeeService {
         }
 
 
-        return buildEmployeesPairDTO(employeesProjectTrippleToCommonWorkingDays, employeesWorkRecords);
+        return buildEmployeesPair(employeesProjectTrippleToCommonWorkingDays, employeesWorkRecords);
     }
 
     // TODO: Start using Optional class for better null values handling in the whole project.
-    private EmployeesPairDTO buildEmployeesPairDTO(
+    private EmployeesPair buildEmployeesPair(
             Map<EmployeesProjectTripple, Integer> employeesProjectTrippleToCommonWorkingDays,
             List<EmployeeWorkRecord> employeesWorkRecords
     ) {
@@ -61,13 +61,13 @@ public class EmployeeServiceBruteForce implements EmployeeService {
         if (entry == null) {
             // If there is no entry since no two employees have worked together we just return two randomly chosen
             // employee ids (not necessarily different) and 0 common working days.
-            return new EmployeesPairDTO(
+            return new EmployeesPair(
                     employeesWorkRecords.get(0).getEmployeeId(),
                     employeesWorkRecords.get(1).getEmployeeId(),
                     0
             );
         }
-        return new EmployeesPairDTO(
+        return new EmployeesPair(
                 entry.getKey().getFirstEmployeeId(),
                 entry.getKey().getSecondEmployeeId(),
                 entry.getValue()

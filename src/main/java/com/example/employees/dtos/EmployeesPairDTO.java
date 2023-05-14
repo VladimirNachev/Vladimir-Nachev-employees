@@ -1,37 +1,30 @@
 package com.example.employees.dtos;
 
+import com.example.employees.models.EmployeesPair;
+
+// TODO: Enhance this class so that 'error' field is of some new type 'Error' and has more data inside it.
 public class EmployeesPairDTO {
-    private long firstEmployeeId;
-    private long secondEmployeeId;
-    private int commonWorkingDaysCount;
+    private EmployeesPair employeesPair = null;
+    private String error = null;
 
-    public EmployeesPairDTO(long firstEmployeeId, long secondEmployeeId, int commonWorkingDaysCount) {
-        this.firstEmployeeId = firstEmployeeId;
-        this.secondEmployeeId = secondEmployeeId;
-        this.commonWorkingDaysCount = commonWorkingDaysCount;
+    public EmployeesPairDTO(EmployeesPair employeesPair) {
+        this.employeesPair = employeesPair;
     }
 
-    public long getFirstEmployeeId() {
-        return firstEmployeeId;
+    public EmployeesPairDTO(String error) {
+        this.error = error;
     }
 
-    public long getSecondEmployeeId() {
-        return secondEmployeeId;
+    public EmployeesPairDTO(EmployeesPair employeesPair, String error) {
+        this.employeesPair = employeesPair;
+        this.error = error;
     }
 
-    public int getCommonWorkingDaysCount() {
-        return commonWorkingDaysCount;
+    public EmployeesPair getEmployeesPair() {
+        return employeesPair;
     }
 
-    public void setFirstEmployeeId(long firstEmployeeId) {
-        this.firstEmployeeId = firstEmployeeId;
-    }
-
-    public void setSecondEmployeeId(long secondEmployeeId) {
-        this.secondEmployeeId = secondEmployeeId;
-    }
-
-    public void setCommonWorkingDaysCount(int commonWorkingDaysCount) {
-        this.commonWorkingDaysCount = commonWorkingDaysCount;
+    public String getError() {
+        return error;
     }
 }
