@@ -1,0 +1,8 @@
+version: "2"
+services:
+  employees:
+    build: .
+    image: employees
+    container_name: employees-container
+    ports:
+      - "8080:8080"
